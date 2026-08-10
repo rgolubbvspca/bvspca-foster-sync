@@ -1,0 +1,29 @@
+name: Foster Animal Sync
+
+on:
+  schedule:
+    - cron: '0 6 * * *'
+    - cron: '0 12 * * *'
+    - cron: '0 18 * * *'
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install delta-sharing pandas pyarrow numpy azure-storage-blob
+      
+      - name: Run foster sync
+        run: python pull_petpoint_data.py
+        env:
+          BEARER_TOKEN: ${{ secrets.BEARER_TOKEN }}
+          STORAGE_KEY: ${{ secrets.STORAGE_KEY }}
